@@ -42,6 +42,7 @@ H264_V4L2DeviceSource::~H264_V4L2DeviceSource()
 {	
 }
 
+extern int streamStatus;
 // split packet in frames					
 std::list< std::pair<unsigned char*,size_t> > H264_V4L2DeviceSource::splitFrames(unsigned char* frame, unsigned frameSize) 
 {				
@@ -57,6 +58,7 @@ std::list< std::pair<unsigned char*,size_t> > H264_V4L2DeviceSource::splitFrames
 			case 7: LOG(INFO) << "SPS size:" << size << " bufSize:" << bufSize; m_sps.assign((char*)buffer,size); break;
 			case 8: LOG(INFO) << "PPS size:" << size << " bufSize:" << bufSize; m_pps.assign((char*)buffer,size); break;
 			case 5: LOG(INFO) << "IDR size:" << size << " bufSize:" << bufSize; 
+				m_idr.assign((char *)buffer, size);
 				if (m_repeatConfig && !m_sps.empty() && !m_pps.empty())
 				{
 					frameList.push_back(std::pair<unsigned char*,size_t>((unsigned char*)m_sps.c_str(), m_sps.size()));
@@ -65,7 +67,19 @@ std::list< std::pair<unsigned char*,size_t> > H264_V4L2DeviceSource::splitFrames
 			break;
 			default: break;
 		}
-		
+
+		if (streamStatus > 0) {
+			streamStatus -= 1;
+			if (streamStatus == 0) {
+				if (!m_idr.empty())
+				{
+					frameList.push_back(std::pair<unsigned char*,size_t>((unsigned char*)m_sps.c_str(), m_sps.size()));
+					frameList.push_back(std::pair<unsigned char*,size_t>((unsigned char*)m_pps.c_str(), m_pps.size()));
+					frameList.push_back(std::pair<unsigned char*,size_t>((unsigned char*)m_idr.c_str(), m_idr.size()));
+				}
+			}
+		}
+
 		if (m_auxLine.empty() && !m_sps.empty() && !m_pps.empty())
 		{
 			u_int32_t profile_level_id = 0;					

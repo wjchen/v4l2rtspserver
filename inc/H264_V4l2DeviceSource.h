@@ -38,6 +38,7 @@ class H264_V4L2DeviceSource : public V4L2DeviceSource
 	private:
 		std::string m_sps;
 		std::string m_pps;
+		std::string m_idr;
 		bool        m_repeatConfig;
 		bool        m_keepMarker;
 		int         m_frameType;

@@ -164,3 +164,11 @@ char const* UnicastServerMediaSubsession::getAuxSDPLine(RTPSink* rtpSink,FramedS
 	return this->getAuxLine(dynamic_cast<V4L2DeviceSource*>(m_replicator->inputSource()), rtpSink->rtpPayloadType());
 }
 		
+int streamStatus = 0;
+void UnicastServerMediaSubsession::startStream(unsigned clientSessionId, void* streamToken, TaskFunc* rtcpRRHandler, void* rtcpRRHandlerClientData, unsigned short& rtpSeqNum,
+	unsigned& rtpTimestamp, ServerRequestAlternativeByteHandler* serverRequestAlternativeByteHandler, void* serverRequestAlternativeByteHandlerClientData)
+{
+	streamStatus += 5;
+	OnDemandServerMediaSubsession::startStream(clientSessionId, streamToken, rtcpRRHandler, rtcpRRHandlerClientData,rtpSeqNum,
+	  rtpTimestamp, serverRequestAlternativeByteHandler, serverRequestAlternativeByteHandlerClientData);
+}
